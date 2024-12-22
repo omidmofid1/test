@@ -1,0 +1,32 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main # شاخه‌ای که می‌خواهید با پوش آپدیت شود.
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v0.1.4
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/project-folder  # مسیر پروژه روی سرور
+            git pull origin main
+            composer install --no-dev --optimize-autoloader
+            php artisan migrate --force
+            php artisan config:clear
+            php artisan cache:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan optimize
+            sudo systemctl restart php8.1-fpm
