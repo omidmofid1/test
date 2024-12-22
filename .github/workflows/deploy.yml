@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/project-folder  # مسیر پروژه روی سرور
+            cd /home/project1  # مسیر پروژه روی سرور
             git pull origin main
             composer install --no-dev --optimize-autoloader
             php artisan migrate --force
