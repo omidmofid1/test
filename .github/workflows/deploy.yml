@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.4
         with:
           host: 82.115.16.174
-          username: 'root'
+          username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/project1  # مسیر پروژه روی سرور
