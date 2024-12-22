@@ -19,8 +19,9 @@ jobs:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
         
     - name: Add SSH Known Hosts
-      run: |
-        ssh-keyscan -H 82.115.16.174 >> ~/.ssh/known_hosts
+      run:  |
+        set -x
+        echo "$SSH_PRIVATE_KEY" | ssh-add -
         
     - name: Deploy to Server
       env:
