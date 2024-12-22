@@ -1,50 +1,24 @@
-name: Deployment Pipeline
+name: Deploy to Server
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main  # زمانی که تغییرات به شاخه اصلی (main) اعمال می‌شود
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
-    
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Set up SSH
-      uses: webfactory/ssh-agent@v0.7.0
+      uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-        
-    - name: Add SSH Known Hosts
-      run:  |
-        set -x
-        echo "$SSH_PRIVATE_KEY" | ssh-add -
-        
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}  # کلید خصوصی SSH باید در Secrets گیت‌هاب ذخیره شود
+
     - name: Deploy to Server
-      env:
-        DEPLOY_PATH: /home/project1
-        SERVER_IP: 82.115.16.174
-        SERVER_USER: root
       run: |
-        # Create deployment script
-        echo "#!/bin/bash" > deploy.sh
-        echo "cd \$DEPLOY_PATH" >> deploy.sh
-        echo "git pull origin main" >> deploy.sh
-        echo "# Add your build commands here" >> deploy.sh
-        echo "# Example:" >> deploy.sh
-        echo "# npm install" >> deploy.sh
-        echo "# npm run build" >> deploy.sh
-        
-        # Make script executable
-        chmod +x deploy.sh
-        
-        # Copy and execute deployment script
-        scp deploy.sh $SERVER_USER@$SERVER_IP:$DEPLOY_PATH/
-        ssh $SERVER_USER@$SERVER_IP "cd $DEPLOY_PATH && ./deploy.sh"
-        
-    - name: Cleanup
-      run: |
-        rm deploy.sh
+        ssh -o StrictHostKeyChecking=no root@82.115.16.174 "cd /home/project1 && git pull origin main && ./deploy.sh"
+      # در اینجا، فرض می‌کنیم که شما اسکریپت `deploy.sh` دارید که استقرار را انجام می‌دهد.
